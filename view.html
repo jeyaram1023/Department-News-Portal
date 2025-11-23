@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Subrat Cart Portal (Mobile Friendly)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Roboto+Mono:wght@700&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            background: #f8fafc;
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .main-container {
+            max-width: 900px;
+            margin: 48px auto 80px;
+            padding: 16px;
+        }
+
+        .title-bar {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #1943c9;
+            text-align: center;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .description-text {
+            font-size: 1.1rem;
+            text-align: center;
+            color: #39455c;
+            margin-bottom: 30px;
+            font-weight: 500;
+            line-height: 1.3;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #search-input {
+            width: 100%;
+            font-size: 1rem;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1.5px solid #a9afc1;
+            margin-bottom: 25px;
+            transition: border-color 0.3s;
+        }
+        #search-input:focus {
+            outline: none;
+            border-color: #0d47a1;
+            box-shadow: 0 0 6px #5c7dfa6b;
+        }
+
+        .entries-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 2px 16px rgba(60,60,110,0.11);
+            width: 350px;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+            transition: box-shadow 0.2s;
+            padding: 20px 25px 18px 25px;
+            box-sizing: border-box;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 32px rgba(40,60,180,0.21);
+        }
+
+        .card-header {
+            padding: 0 0 12px 0;
+            border-bottom: 1px solid #d6dce7;
+            margin-bottom: 15px;
+        }
+
+        .entry-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #143965;
+            margin-bottom: 4px;
+            letter-spacing: 0.2px;
+            word-break: break-word;
+        }
+        .entry-source {
+            font-size: 1rem;
+            color: #626881;
+            margin-bottom: 0;
+            word-break: break-word;
+        }
+
+        .card-body {
+            padding: 0 0 14px 0;
+        }
+        .entry-destination {
+            font-size: 1.1rem;
+            color: #1f2658;
+            margin-bottom: 12px;
+            font-weight: 500;
+            word-break: break-word;
+        }
+        .entry-link {
+            margin-bottom: 6px;
+        }
+        .entry-link a {
+            word-break: break-word;
+            color: #156cd4;
+            font-size: 1rem;
+            text-decoration: underline;
+        }
+
+        .card-bottom {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0;
+        }
+        .entry-symbol {
+            cursor: pointer;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #f99824;
+            letter-spacing: 3px;
+            background: #fff8f1;
+            border-radius: 7px;
+            padding: 4px 16px;
+            border: 2px solid #f7c274;
+            margin-right: 10px;
+            user-select: none;
+            transition: background-color 0.2s, color 0.2s;
+            white-space: nowrap;
+        }
+        .entry-symbol:hover {
+            background-color: #f7c274;
+            color: #6e3b00;
+        }
+        .entry-datetime {
+            font-size: 0.95rem;
+            color: #9a9bb8;
+            text-align: right;
+            line-height: 1.2;
+            word-break: keep-all;
+            min-width: 140px;
+        }
+        .relative-time {
+            font-style: italic;
+            font-size: 0.85rem;
+            color: #5a5f7a;
+        }
+
+        .loading-container {
+            text-align: center;
+            margin: 30px 0;
+            color: #546e7a;
+            font-weight: 600;
+        }
+        .spinner {
+            margin: 0 auto 12px auto;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #1943c9;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            animation: spin 1s linear infinite;
+        }
+
+        .error-message {
+            color: #c62828;
+            font-weight: 600;
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0 40px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .page-btn {
+            background-color: #e2e7f2;
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-weight: 700;
+            cursor: pointer;
+            color: #1943c9;
+            user-select: none;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .page-btn:hover:not(.active) {
+            background-color: #1943c9;
+            color: #fefefe;
+        }
+        .page-btn.active {
+            background-color: #0d47a1;
+            color: white;
+            cursor: default;
+        }
+
+        @keyframes fadeIn {
+            to {opacity: 1;}
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 1100px) {
+            .main-container {
+                max-width: 99vw;
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+            .card {
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+        @media (max-width: 600px) {
+            .main-container { padding: 10px 12px 60px; }
+            .entries-list { gap: 14px; }
+            .entry-symbol {
+                font-size: 1.3rem;
+                letter-spacing: 2px;
+                padding: 3px 12px;
+            }
+            .entry-datetime {
+                font-size: 0.88rem;
+                min-width: unset;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="title-bar">Subrat Cart Portal</div>
+        <div class="description-text">
+            Explore recent entries on Subrat Cart, showing user names, sources, destinations, stock symbols, and timestamps. Use the search box below to filter results.
+        </div>
+        <input type="text" id="search-input" placeholder="Search by Name, Source, or Stock Symbol ..." aria-label="Search entries" />
+        <div id="entries-list" class="entries-list" aria-live="polite" aria-busy="false"></div>
+        <div id="loading" class="loading-container" style="display:none;">
+            <div class="spinner"></div>
+            Loading entries...
+        </div>
+        <div id="error-message" class="error-message" style="display:none;"></div>
+        <div class="pagination" id="pagination"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://iyqbqtgvalnfyzatdrjg.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5cWJxdGd2YWxuZnl6YXRkcmpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMyMjE1NzksImV4cCI6MjA3ODc5NzU3OX0.6sRo8-u6OVr3jPiBOT80oAmOLT_sYoh7zBP11om7jjY';
+
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        const entriesListEl = document.getElementById('entries-list');
+        const loadingEl = document.getElementById('loading');
+        const errorMessageEl = document.getElementById('error-message');
+        const searchInput = document.getElementById('search-input');
+        const paginationEl = document.getElementById('pagination');
+
+        let allEntries = [];
+        let filteredEntries = [];
+        let currentPage = 1;
+        const pageSize = 10;
+
+        function showLoading(show) {
+            loadingEl.style.display = show ? 'block' : 'none';
+            entriesListEl.style.display = show ? 'none' : 'flex';
+            errorMessageEl.style.display = 'none';
+        }
+
+        function showError(message) {
+            errorMessageEl.textContent = message;
+            errorMessageEl.style.display = 'block';
+            loadingEl.style.display = 'none';
+            entriesListEl.style.display = 'none';
+            paginationEl.style.display = 'none';
+        }
+
+        async function fetchEntries() {
+            showLoading(true);
+            try {
+                let { data, error } = await supabase
+                    .from('hotel_entries')
+                    .select('*')
+                    .order('created_time', { ascending: false });
+
+                if (error) throw error;
+                allEntries = data || [];
+                filteredEntries = allEntries;
+                currentPage = 1;
+                renderPage();
+                showLoading(false);
+                paginationEl.style.display = allEntries.length > pageSize ? 'flex' : 'none';
+            } catch (err) {
+                showError('Error loading data: ' + err.message);
+            }
+        }
+
+        function formatTime(datetime) {
+            if (!datetime) return '';
+            const d = new Date(datetime);
+            if (isNaN(d)) return datetime;
+            return d.toLocaleString();
+        }
+
+        function formatRelativeTime(datetime) {
+            if (!datetime) return '';
+            const now = new Date();
+            const d = new Date(datetime);
+            if (isNaN(d)) return '';
+            const diff = (now - d) / 1000;
+
+            if (diff < 60) return 'just now';
+            if (diff < 3600) return Math.floor(diff / 60) + ' min ago';
+            if (diff < 86400) return Math.floor(diff / 3600) + ' hr ago';
+            if (diff < 604800) return Math.floor(diff / 86400) + ' day(s) ago';
+            return d.toLocaleDateString();
+        }
+
+        function escapeHtml(str) {
+            return String(str ?? '').replace(/[&<>"']/g, function(match) {
+                return ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                })[match];
+            });
+        }
+
+        function portalCard(entry) {
+            const linkHtml = entry.reference_link
+                ? `<a href="${escapeHtml(entry.reference_link)}" target="_blank" rel="noopener noreferrer">More Info</a>`
+                : '';
+
+            // 🔥 FIXED — stock search link works 100% now
+            const encodedStock = encodeURIComponent(entry.stock_symbol);
+
+            return `
+            <div class="card" role="article" tabindex="0" aria-label="Entry for ${escapeHtml(entry.user_name)}">
+                <div class="card-header">
+                    <div class="entry-title">${escapeHtml(entry.user_name)}</div>
+                    <div class="entry-source">Source: ${escapeHtml(entry.user_source)}</div>
+                </div>
+                <div class="card-body">
+                    <div class="entry-destination">Destination: ${escapeHtml(entry.user_place)}</div>
+                    <div class="entry-link">${linkHtml}</div>
+                </div>
+                <div class="card-bottom">
+                    <a href="https://www.google.com/search?q=${encodedStock}"
+                       target="_blank" rel="noopener noreferrer"
+                       class="entry-symbol"
+                       title="Search '${escapeHtml(entry.stock_symbol)}' on Google">
+                       ${escapeHtml(entry.stock_symbol)}
+                    </a>
+                    <div class="entry-datetime">
+                        ${formatTime(entry.selected_time)}<br/>
+                        <span class="relative-time">${formatRelativeTime(entry.created_time)}</span>
+                    </div>
+                </div>
+            </div>
+            `;
+        }
+
+        function renderPage() {
+            const startIdx = (currentPage - 1) * pageSize;
+            const endIdx = startIdx + pageSize;
+            const entriesToShow = filteredEntries.slice(startIdx, endIdx);
+
+            if (entriesToShow.length === 0) {
+                entriesListEl.innerHTML = '<div style="color:#6b7280; text-align:center; width:100%;">No entries found.</div>';
+                paginationEl.style.display = 'none';
+                return;
+            }
+
+            entriesListEl.innerHTML = entriesToShow.map(portalCard).join('');
+            paginationEl.style.display = filteredEntries.length > pageSize ? 'flex' : 'none';
+
+            renderPaginationControls();
+        }
+
+        function renderPaginationControls() {
+            const pageCount = Math.ceil(filteredEntries.length / pageSize);
+            if (pageCount <= 1) {
+                paginationEl.style.display = 'none';
+                return;
+            }
+
+            let buttonsHtml = '';
+            for (let i = 1; i <= pageCount; i++) {
+                buttonsHtml += `<div class="page-btn${i === currentPage ? ' active' : ''}" data-page="${i}">${i}</div>`;
+            }
+            paginationEl.innerHTML = buttonsHtml;
+
+            [...paginationEl.children].forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (!btn.classList.contains('active')) {
+                        currentPage = Number(btn.getAttribute('data-page'));
+                        renderPage();
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                });
+            });
+        }
+
+        function filterEntries(searchTerm) {
+            const term = searchTerm.trim().toLowerCase();
+            if (!term) {
+                filteredEntries = allEntries;
+            } else {
+                filteredEntries = allEntries.filter(entry =>
+                    (entry.user_name && entry.user_name.toLowerCase().includes(term)) ||
+                    (entry.user_source && entry.user_source.toLowerCase().includes(term)) ||
+                    (entry.stock_symbol && entry.stock_symbol.toLowerCase().includes(term))
+                );
+            }
+            currentPage = 1;
+            renderPage();
+        }
+
+        searchInput.addEventListener('input', () => filterEntries(searchInput.value));
+
+        fetchEntries();
+    </script>
+</body>
+</html>
